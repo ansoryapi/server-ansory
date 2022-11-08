@@ -82,5 +82,30 @@ def insertnilai():
     else :
         return {"data":"anda sudah mengerjakan test !"}
 
+@app.route("/getuserdata",methods=["POST"])
+def getuserdata():
+    data = request.form.to_dict(flat=False)
+    val = doc_ref.where("username","==",data['username'][0]).get()
+    dataNilai = tbl_nilai.where("username","==",data['username'][0]).get()
+    djson = []
+    if(len(dataNilai) == 0):
+         for i in range(len(val)):
+            nama = val[i].to_dict()['nama siswa']
+            kelas = val[i].to_dict()['kelas']
+            absen = val[i].to_dict()['absen']
+            username = val[i].to_dict()['username']
+            ids = val[i].id
+            djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username,"nilai" : "belum tes"})
+    else:
+        for i in range(len(val)):
+            nama = val[i].to_dict()['nama siswa']
+            kelas = val[i].to_dict()['kelas']
+            absen = val[i].to_dict()['absen']
+            username = val[i].to_dict()['username']
+            ids = val[i].id
+            nil = dataNilai[i].to_dict()['nilai']
+            djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username,"nilai" : nil})
+    return{"data":djson}
+
 if __name__ == "__main__":
     app.run(debug=True,)
