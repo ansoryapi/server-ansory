@@ -8,7 +8,10 @@ from flask_cors import CORS
 #url https://ansoryapi.herokuapp.com/
 app = Flask(__name__)
 CORS(app)
-cred = credentials.Certificate('ansory-8dc38-firebase-adminsdk-2xtx8-de4e743e1b.json')
+##heroku
+# cred = credentials.Certificate('ansory-8dc38-firebase-adminsdk-2xtx8-de4e743e1b.json')
+##python anywhere
+cred = credentials.Certificate('/home/syihabuddin/mysite/ansory-8dc38-firebase-adminsdk-2xtx8-de4e743e1b.json')
 firebase_admin.initialize_app(cred)
 dbq = firestore.client()
 doc_ref = dbq.collection('datasiswa')
@@ -35,7 +38,7 @@ def getdatasiswa():
         username = data[i].to_dict()['username']
         ids = data[i].id
         if(len(dataNilai) == 0):
-            djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username,"nilai" : "0"})
+            djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username,"nilai" : "belum tes"})
         else:
             flag = 0
             for j in range(len(dataNilai)):
@@ -44,7 +47,7 @@ def getdatasiswa():
                     djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username,"nilai" : dataNilai[j].to_dict()['nilai']})
                     break
             if(flag == 0):
-                djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username,"nilai" : "0"})
+                djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username,"nilai" : "belum tes"})
             
     return{"data":djson}
 
