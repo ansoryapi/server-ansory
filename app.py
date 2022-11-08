@@ -12,6 +12,7 @@ cred = credentials.Certificate('ansory-8dc38-firebase-adminsdk-2xtx8-de4e743e1b.
 firebase_admin.initialize_app(cred)
 dbq = firestore.client()
 doc_ref = dbq.collection('datasiswa')
+tbl_nilai = dbq.collection('testresult')
 
 @app.route('/login',methods=["POST"])
 def login():
@@ -25,6 +26,7 @@ def login():
 @app.route("/getdatasiswa")
 def getdatasiswa():
     data = doc_ref.get()
+    dataNilai = tbl_nilai.get()
     djson = []
     for i in range(len(data)):
         nama = data[i].to_dict()['nama siswa']
@@ -32,8 +34,20 @@ def getdatasiswa():
         absen = data[i].to_dict()['absen']
         username = data[i].to_dict()['username']
         ids = data[i].id
-        djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username})
+        if(len(dataNilai) == 0):
+            djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username,"nilai" : "0"})
+        else:
+            flag = 0
+            for j in range(len(dataNilai)):
+                if(data[i].to_dict()['username'] == dataNilai[j].to_dict()['username']):
+                    flag = 1
+                    djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username,"nilai" : dataNilai[j].to_dict()['nilai']})
+                    break
+            if(flag == 0):
+                djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username,"nilai" : "0"})
+            
     return{"data":djson}
+
 
 @app.route("/register",methods=["POST"])
 def register():
@@ -54,7 +68,16 @@ def register():
 
 @app.route("/insertnilai",methods=["POST"])
 def insertnilai():
-    return {"data":"sukses"}
+    data = request.form.to_dict(flat=False)
+    val = tbl_nilai.where("username","==",data['username'][0]).get()
+    if(len(val)==0):
+        tbl_nilai.document().set({
+            'username' : data['username'][0],
+            'nilai' : data['nilai'][0]
+        })
+        return {"data" : "sukses"}
+    else :
+        return {"data":"anda sudah mengerjakan test !"}
 
 if __name__ == "__main__":
     app.run(debug=True,)
