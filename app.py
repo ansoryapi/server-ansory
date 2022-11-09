@@ -44,7 +44,7 @@ def getdatasiswa():
             for j in range(len(dataNilai)):
                 if(data[i].to_dict()['username'] == dataNilai[j].to_dict()['username']):
                     flag = 1
-                    djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username,"nilai" : dataNilai[j].to_dict()['nilai']})
+                    djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":dataNilai[j].id,"username":username,"nilai" : dataNilai[j].to_dict()['nilai']})
                     break
             if(flag == 0):
                 djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username,"nilai" : "belum tes"})
