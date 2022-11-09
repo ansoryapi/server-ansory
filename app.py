@@ -51,7 +51,6 @@ def getdatasiswa():
             
     return{"data":djson}
 
-
 @app.route("/register",methods=["POST"])
 def register():
     data = request.form.to_dict(flat=False)
@@ -106,6 +105,18 @@ def getuserdata():
             nil = dataNilai[i].to_dict()['nilai']
             djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username,"nilai" : nil})
     return{"data":djson}
+
+@app.route("/deletenilai",methods=["POST"])
+def deletenilai():
+    data = request.form.to_dict(flat=False)
+    tbl_nilai.document(data['id'][0]).delete()
+    val = tbl_nilai.where("username","==",data['username'][0]).get()
+    if(len(val)> 0):
+        for i in range(len(data)):
+            ids = data[i].id
+            if(ids == data['id'][0]):
+                return {"data" : "gagal dihapus coba lagi !"}
+    return {"data":"berhasil dihapus"}
 
 if __name__ == "__main__":
     app.run(debug=True,)
