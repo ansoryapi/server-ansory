@@ -22,7 +22,7 @@ def login():
     data = request.form.to_dict(flat=False)
     val = doc_ref.where("username","==",data['username'][0]).where("pass","==",data['pass'][0]).get()
     if (len(val) == 1):
-        return {"data" : "sukses","nama":val[0].to_dict()['nama siswa'],"kelas":val[0].to_dict()['kelas'],"absen" :val[0].to_dict()['absen'],"username":val[0].to_dict()['username']}
+        return {"data" : "sukses","nama":val[0].to_dict()['nama siswa'],"kelas":val[0].to_dict()['kelas'],"absen" :val[0].to_dict()['absen'],"username":val[0].to_dict()['username'], "id" : val[0].id}
     else:
         return{"data":"password atau username salah"}
 
@@ -38,16 +38,16 @@ def getdatasiswa():
         username = data[i].to_dict()['username']
         ids = data[i].id
         if(len(dataNilai) == 0):
-            djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username,"nilai" : "belum tes"})
+            djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":"","username":username,"nilai" : "belum tes","idsiswa": ids})
         else:
             flag = 0
             for j in range(len(dataNilai)):
                 if(data[i].to_dict()['username'] == dataNilai[j].to_dict()['username']):
                     flag = 1
-                    djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":dataNilai[j].id,"username":username,"nilai" : dataNilai[j].to_dict()['nilai']})
+                    djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":dataNilai[j].id,"username":username,"nilai" : dataNilai[j].to_dict()['nilai'],"idsiswa": ids})
                     break
             if(flag == 0):
-                djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":ids,"username":username,"nilai" : "belum tes"})
+                djson.append({"nama" : nama,'absen' : absen,'kelas' : kelas,"id":"","username":username,"nilai" : "belum tes","idsiswa": ids})
             
     return{"data":djson}
 
@@ -64,7 +64,10 @@ def register():
             'pass':data['pass'][0],
             'username':data['username'][0],
         })
-        return{"data":"sukses"}
+        valz = doc_ref.where("username","==",data['username'][0]).get()
+        for i in range(len(valz)):
+            ids = valz[i].id
+        return{"data":"sukses","id" :ids}
     else:
         return{"data":"username telah diambil"}
 
@@ -111,6 +114,18 @@ def deletenilai():
     data = request.form.to_dict(flat=False)
     tbl_nilai.document(data['id'][0]).delete()
     val = tbl_nilai.where("username","==",data['username'][0]).get()
+    if(len(val)> 0):
+        for i in range(len(data)):
+            ids = data[i].id
+            if(ids == data['id'][0]):
+                return {"data" : "gagal dihapus coba lagi !"}
+    return {"data":"berhasil dihapus"}
+
+@app.route("/deletesiswa",methods=["POST"])
+def deletesiswa():
+    data = request.form.to_dict(flat=False)
+    doc_ref.document(data['id'][0]).delete()
+    val = doc_ref.where("username","==",data['username'][0]).get()
     if(len(val)> 0):
         for i in range(len(data)):
             ids = data[i].id
