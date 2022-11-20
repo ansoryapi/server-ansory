@@ -6,6 +6,7 @@ from flask_cors import CORS
 
 ###initialize git
 #url https://ansoryapi.herokuapp.com/
+#url baru http://syihabuddin.pythonanywhere.com/
 app = Flask(__name__)
 CORS(app)
 ##heroku
